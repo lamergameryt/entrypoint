@@ -88,10 +88,10 @@ entrypoint/
 
 ### Prerequisites
 
-**CRITICAL**: Before running **ANY** Gradle command, you **MUST** create an `env.properties` file in the `entrypoint-backend` directory. The application references this file in `application.properties` and will fail without it.
+**For running the application** (not required for building or testing), you need to create an `env.properties` file in the `entrypoint-backend` directory with database credentials.
 
 ```bash
-# Create env.properties with these required variables:
+# Create env.properties for running the application:
 cd entrypoint-backend
 cat > env.properties << 'EOF'
 DB_DATABASE=entrypoint
@@ -100,7 +100,7 @@ DB_PASSWORD=password
 EOF
 ```
 
-**Note**: `env.properties` is in `.gitignore` and should NEVER be committed.
+**Note**: `env.properties` is in `.gitignore` and should NEVER be committed. Tests use H2 in-memory database and do not require this file.
 
 ### Runtime Requirements
 
@@ -134,30 +134,18 @@ cd entrypoint-backend
 
 #### Build with Tests
 ```bash
-# IMPORTANT: Tests require env.properties but do NOT require MySQL
-# DataJpaTest tests use H2 in-memory database
-# SpringBootTest fails without MySQL - see workaround below
-
 ./gradlew build
 # Takes: ~10 seconds
-# WARNING: Will fail on EntrypointApplicationTests without MySQL running
-# 3 DataJpaTest tests will pass, 1 SpringBootTest will fail
-```
-
-**Test Workaround**: To build successfully without MySQL, skip tests:
-```bash
-./gradlew build -x test
-# Takes: ~3-5 seconds
 # Success: "BUILD SUCCESSFUL"
-# This is the RECOMMENDED build command for CI/CD without MySQL
+# Note: Tests use H2 in-memory database configured in src/test/resources/application.properties
+# No env.properties or MySQL required for tests
 ```
 
 #### Run Tests Only
 ```bash
 ./gradlew test
 # Takes: ~8 seconds
-# Requires: env.properties (but NOT MySQL for DataJpaTest tests)
-# Note: EntrypointApplicationTests will fail without MySQL
+# Tests use H2 in-memory database - no env.properties or MySQL required
 ```
 
 ### Code Quality Commands
@@ -210,29 +198,15 @@ CREATE DATABASE entrypoint;
 
 ### Common Build Issues and Solutions
 
-#### Issue 1: "Config data resource 'file [env.properties]' cannot be found"
-**Cause**: Missing `env.properties` file  
+#### Issue 1: "Config data resource 'file [env.properties]' cannot be found" when running application
+**Cause**: Missing `env.properties` file (only needed for running the application, not tests)
 **Solution**: Create the file as shown in Prerequisites section above
 
-#### Issue 2: "Unable to determine Dialect without JDBC metadata"
-**Cause**: MySQL not running or connection failed  
-**Solution**: 
-- For building/testing: Use `./gradlew build -x test`
-- For running: Start MySQL and create database
-- For tests only: DataJpaTest tests work without MySQL (use H2)
-
-#### Issue 3: Tests fail with "ApplicationContext failure"
-**Cause**: `EntrypointApplicationTests` requires MySQL connection  
-**Solution**: 
-- Skip tests with `-x test` flag
-- Or start MySQL before running tests
-- Note: Repository tests in `db/` package work without MySQL
-
-#### Issue 4: First Gradle command is slow (~40-60 seconds)
+#### Issue 2: First Gradle command is slow (~40-60 seconds)
 **Cause**: Gradle daemon initialization and dependency downloads  
 **Solution**: This is normal on first run. Subsequent builds are faster (~3-5 seconds)
 
-#### Issue 5: Spotless formatting failures
+#### Issue 3: Spotless formatting failures
 **Cause**: Code doesn't match formatting rules  
 **Solution**: Run `./gradlew spotlessApply` to auto-fix
 
@@ -284,9 +258,9 @@ The project uses:
    - Example: `EntrypointApplicationTests.java`
 
 **Test Running Strategy**:
-- For development: `./gradlew test -x :test --tests "*Repository*"` (DB tests only)
-- For CI without MySQL: `./gradlew build -x test`
-- For full validation with MySQL: `./gradlew build`
+- For all tests: `./gradlew test` or `./gradlew build`
+- Tests use H2 in-memory database (configured in `src/test/resources/application.properties`)
+- No MySQL or env.properties required for testing
 
 ## Dependencies and Configuration
 
@@ -313,14 +287,12 @@ The project uses:
 
 Before committing changes, ALWAYS:
 
-1. ✅ Create/verify `env.properties` exists
-2. ✅ Run `./gradlew spotlessApply` to format code
-3. ✅ Run `./gradlew spotlessCheck` to verify formatting
-4. ✅ Run `./gradlew build -x test` to verify compilation
-5. ✅ Run relevant tests if possible
-6. ✅ Ensure AGPL-3.0 headers are on new files
-7. ✅ Update Javadoc for public API changes
-8. ✅ Do NOT commit `env.properties`, build artifacts, or IDE files
+1. ✅ Run `./gradlew spotlessApply` to format code
+2. ✅ Run `./gradlew spotlessCheck` to verify formatting
+3. ✅ Run `./gradlew build` to compile and test
+4. ✅ Ensure AGPL-3.0 headers are on new files
+5. ✅ Update Javadoc for public API changes
+6. ✅ Do NOT commit `env.properties`, build artifacts, or IDE files
 
 ## Quick Reference
 
@@ -328,28 +300,27 @@ Before committing changes, ALWAYS:
 # Standard development workflow
 cd entrypoint-backend
 
-# First time setup
-cat > env.properties << 'EOF'
-DB_DATABASE=entrypoint_test
-DB_USERNAME=test  
-DB_PASSWORD=test
-EOF
-
 # Make code changes, then:
 ./gradlew spotlessApply              # Format code
-./gradlew build -x test              # Build without MySQL
-# OR with MySQL running:
-./gradlew build                      # Build with tests
+./gradlew build                      # Build and test (uses H2 in-memory DB)
 
-# Run application (requires MySQL)
+# To run the application (requires MySQL and env.properties):
+# First, create env.properties:
+cat > env.properties << 'EOF'
+DB_DATABASE=entrypoint
+DB_USERNAME=root  
+DB_PASSWORD=password
+EOF
+# Then start the application:
 ./gradlew bootRun
 ```
 
 ## Important Notes
 
 - **Trust these instructions**: Only search for additional information if these instructions are incomplete or incorrect
-- **Database is optional** for building and most testing, but required for running the application
-- **env.properties is required** for ALL Gradle tasks, even though it's not committed to Git
+- **Tests use H2**: All tests use H2 in-memory database (configured in `src/test/resources/application.properties`)
+- **env.properties only for running**: The `env.properties` file is only required for running the application with `bootRun`, not for building or testing
+- **MySQL only for running**: MySQL is only required when running the application, not for building or testing
 - **First Gradle run is slow** (~40-60 seconds) due to initialization and downloads
 - **Frontend is not yet in this repository** - only backend code exists currently
 - **No CI/CD workflows** are configured yet - this is a local development setup only
