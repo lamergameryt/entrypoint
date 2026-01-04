@@ -21,17 +21,17 @@ package com.lamergameryt.entrypoint.db.user;
 import com.lamergameryt.entrypoint.db.DbTestBase;
 import com.lamergameryt.entrypoint.model.UserModel;
 import com.lamergameryt.entrypoint.repository.UserRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
-
 public class UserRepositoryTest extends DbTestBase {
     @Autowired
     private UserRepository repository;
+
     private UserModel user;
 
     @BeforeEach

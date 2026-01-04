@@ -21,5 +21,4 @@ package com.lamergameryt.entrypoint.db;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
 @DataJpaTest
-public class DbTestBase {
-}
+public class DbTestBase {}
