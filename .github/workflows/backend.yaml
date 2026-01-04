@@ -2,8 +2,11 @@ name: Backend CI
 
 on:
   push:
-    branches:
-      - '*'
+    paths:
+      - 'entrypoint-backend/**'
+  pull_request:
+    paths:
+      - 'entrypoint-backend/**'
 
 jobs:
   lint:
