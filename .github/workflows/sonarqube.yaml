@@ -38,4 +38,4 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         working-directory: ./entrypoint-backend
-        run: ./gradlew build -x test sonar --info
+        run: ./gradlew build sonar --info
