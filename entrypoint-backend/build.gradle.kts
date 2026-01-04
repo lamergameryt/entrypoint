@@ -24,6 +24,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "8.1.0"
     id("com.adarshr.test-logger") version "4.0.0"
+    id("org.sonarqube") version "7.2.2.6593"
 }
 
 group = "com.lamergameryt"
@@ -98,6 +99,13 @@ spotless {
 
 testlogger {
     theme = ThemeType.MOCHA
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "lamergameryt_entrypoint")
+        property("sonar.organization", "lamergameryt")
+    }
 }
 
 tasks.withType<Test> {
