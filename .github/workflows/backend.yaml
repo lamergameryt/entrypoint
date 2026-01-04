@@ -1,0 +1,24 @@
+name: Backend CI
+
+on:
+  push:
+    paths:
+      - 'entrypoint-backend/**'
+  pull_request:
+    paths:
+      - 'entrypoint-backend/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/actions/setup-java
+      - name: Run all tests
+        run: ./gradlew test --no-daemon
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/actions/setup-java
+      - name: Check code formatting
+        run: ./gradlew spotlessCheck --no-daemon

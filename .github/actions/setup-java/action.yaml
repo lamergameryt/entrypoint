@@ -1,0 +1,14 @@
+name: Setup Java 17
+description: Checkout repo and setup Java 17 with Gradle cache
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'microsoft'
+        cache: 'gradle'
