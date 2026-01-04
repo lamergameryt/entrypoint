@@ -6,16 +6,28 @@ on:
       - '*'
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: ./.github/actions/setup-java
-      - name: Run all tests
-        run: ./gradlew test --no-daemon
-
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/setup-java
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: ./.github/actions/setup-java
+
       - name: Check code formatting
+        working-directory: ./entrypoint-backend
         run: ./gradlew spotlessCheck --no-daemon
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: /.github/actions/setup-java
+
+      - name: Run all tests
+        working-directory: ./entrypoint-backend
+        run: ./gradlew test --no-daemon
