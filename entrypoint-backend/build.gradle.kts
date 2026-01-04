@@ -20,10 +20,12 @@ import com.adarshr.gradle.testlogger.theme.ThemeType
 
 plugins {
     java
+    jacoco
     id("org.springframework.boot") version "4.0.1"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "8.1.0"
     id("com.adarshr.test-logger") version "4.0.0"
+    id("org.sonarqube") version "7.2.2.6593"
 }
 
 group = "com.lamergameryt"
@@ -98,6 +100,23 @@ spotless {
 
 testlogger {
     theme = ThemeType.MOCHA
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "lamergameryt_entrypoint")
+        property("sonar.organization", "lamergameryt")
+    }
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required.set(true)
+    }
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.withType<Test> {
