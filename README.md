@@ -11,42 +11,29 @@
 
 ## 🛠️ Tech Stack
 
-> *(Update this section with your actual stack)*
+* Frontend: React, Vite
+* Backend: Spring Boot + Hibernate
+* Database: MySQL
+* Authentication: JWT Tokens
 
-* Frontend:
-* Backend:
-* Database:
-* Authentication:
-
-## 📦 Installation
+## 📦 Running the backend
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/entrypoint.git
+git clone https://github.com/lamergameryt/entrypoint.git
 
-# Navigate to the project directory
-cd entrypoint
+# Navigate to the project backend directory
+cd entrypoint/entrypoint-backend
 
-# Install dependencies
-npm install
+# Run the application
+./gradlew bootRun
 ```
 
-## ▶️ Running the Project
+## ▶️ Running the Prontend
 
 ```bash
+cd entrypoint/entrypoint-fronten
 npm run dev
-```
-
-> Or replace with the correct command for your setup.
-
-## 📂 Project Structure
-
-```
-entrypoint/
-├── src/
-├── public/
-├── README.md
-└── package.json
 ```
 
 ## 🤝 Contributing
@@ -56,4 +43,4 @@ Feel free to open issues or submit pull requests.
 
 ## 📄 License
 
-This project is licensed under the **MIT License**.
+This project is licensed under the **AGPL License**.
