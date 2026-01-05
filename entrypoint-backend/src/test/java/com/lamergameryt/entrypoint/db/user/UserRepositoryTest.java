@@ -21,7 +21,6 @@ package com.lamergameryt.entrypoint.db.user;
 import com.lamergameryt.entrypoint.db.DbTestBase;
 import com.lamergameryt.entrypoint.model.UserModel;
 import com.lamergameryt.entrypoint.repository.UserRepository;
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,11 +45,11 @@ class UserRepositoryTest extends DbTestBase {
     @Test
     @DisplayName("Should save and fetch user successfully")
     void shouldSaveAndFetch() {
-        UserModel savedUser = repository.save(testUser);
+        var savedUser = repository.save(testUser);
         Assertions.assertNotNull(savedUser.getId());
 
-        long userId = savedUser.getId();
-        Optional<UserModel> user = repository.findById(userId);
+        var userId = savedUser.getId();
+        var user = repository.findById(userId);
         Assertions.assertTrue(user.isPresent());
 
         Assertions.assertEquals(user.get().getId(), savedUser.getId());
@@ -62,7 +61,7 @@ class UserRepositoryTest extends DbTestBase {
     @Test
     @DisplayName("Should update user successfully")
     void shouldUpdateUser() {
-        UserModel savedUser = repository.save(testUser);
+        var savedUser = repository.save(testUser);
 
         String newName = "Updated Name";
         String newEmail = "updatedemail@gmail.com";
@@ -70,7 +69,7 @@ class UserRepositoryTest extends DbTestBase {
         savedUser.setName(newName);
         savedUser.setEmail(newEmail);
 
-        Optional<UserModel> user = repository.findById(savedUser.getId());
+        var user = repository.findById(savedUser.getId());
 
         Assertions.assertTrue(user.isPresent());
         Assertions.assertEquals(newName, user.get().getName());
@@ -80,12 +79,25 @@ class UserRepositoryTest extends DbTestBase {
     @Test
     @DisplayName("Should delete user successfully")
     void shouldDeleteUser() {
-        UserModel savedUser = repository.save(testUser);
-        long userId = savedUser.getId();
+        var savedUser = repository.save(testUser);
+        var userId = savedUser.getId();
 
         repository.deleteById(userId);
 
-        Optional<UserModel> user = repository.findById(userId);
+        var user = repository.findById(userId);
         Assertions.assertFalse(user.isPresent());
+    }
+
+    @Test
+    @DisplayName("Should find user by email and password successfully")
+    void shouldFindByEmailAndPassword() {
+        var savedUser = repository.save(testUser);
+        var user = repository.findByEmailAndPassword(savedUser.getEmail(), savedUser.getPassword());
+
+        Assertions.assertTrue(user.isPresent());
+        Assertions.assertEquals(savedUser.getId(), user.get().getId());
+        Assertions.assertEquals(savedUser.getName(), user.get().getName());
+        Assertions.assertEquals(savedUser.getEmail(), user.get().getEmail());
+        Assertions.assertEquals(savedUser.getPassword(), user.get().getPassword());
     }
 }
