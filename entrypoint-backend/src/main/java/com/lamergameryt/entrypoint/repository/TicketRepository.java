@@ -42,7 +42,7 @@ public interface TicketRepository extends JpaRepository<TicketModel, Long> {
 
     List<TicketModel> findAllByEvent_Id(long eventId);
 
-    @Modifying
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("DELETE FROM TicketModel t WHERE t.id = :ticketId AND t.event.id = :eventId")
     int deleteByIdAndEventId(long ticketId, long eventId);
 }
