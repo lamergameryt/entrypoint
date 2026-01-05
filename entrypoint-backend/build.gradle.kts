@@ -61,13 +61,13 @@ dependencies {
     // SpringDoc dependencies for OpenAI, Swagger, and Scalar
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-scalar:$springDocVersion")
-
-    // Javadoc Scribe dependencies for using Javadoc instead of SpringDoc annotations
-    annotationProcessor("com.github.therapi:therapi-runtime-javadoc-scribe:$therApiVersion")
-    runtimeOnly("com.github.therapi:therapi-runtime-javadoc:$therApiVersion")
-
+    
     compileOnly("org.projectlombok:lombok")
+
     annotationProcessor("org.projectlombok:lombok")
+    annotationProcessor("com.github.therapi:therapi-runtime-javadoc-scribe:$therApiVersion")
+
+    runtimeOnly("com.github.therapi:therapi-runtime-javadoc:$therApiVersion")
     runtimeOnly("com.mysql:mysql-connector-j")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")

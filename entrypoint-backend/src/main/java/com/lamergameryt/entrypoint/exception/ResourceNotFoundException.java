@@ -18,9 +18,7 @@
 
 package com.lamergameryt.entrypoint.exception;
 
-import jakarta.persistence.EntityNotFoundException;
-
-public class ResourceNotFoundException extends EntityNotFoundException {
+public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {
         super(message);
     }

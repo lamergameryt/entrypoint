@@ -28,15 +28,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class UserRepositoryTest extends DbTestBase {
+class UserRepositoryTest extends DbTestBase {
     @Autowired
     private UserRepository repository;
 
-    private UserModel user;
+    private UserModel testUser;
 
     @BeforeEach
-    public void setUp() {
-        user = UserModel.builder()
+    void setUp() {
+        testUser = UserModel.builder()
                 .name("Test User")
                 .email("testuser@gmail.com")
                 .password("securepassword")
@@ -45,8 +45,8 @@ public class UserRepositoryTest extends DbTestBase {
 
     @Test
     @DisplayName("Should save and fetch user successfully")
-    public void shouldSaveAndFetch() {
-        UserModel savedUser = repository.save(user);
+    void shouldSaveAndFetch() {
+        UserModel savedUser = repository.save(testUser);
         Assertions.assertNotNull(savedUser.getId());
 
         long userId = savedUser.getId();
@@ -61,8 +61,8 @@ public class UserRepositoryTest extends DbTestBase {
 
     @Test
     @DisplayName("Should update user successfully")
-    public void shouldUpdateUser() {
-        UserModel savedUser = repository.save(user);
+    void shouldUpdateUser() {
+        UserModel savedUser = repository.save(testUser);
 
         String newName = "Updated Name";
         String newEmail = "updatedemail@gmail.com";
@@ -79,8 +79,8 @@ public class UserRepositoryTest extends DbTestBase {
 
     @Test
     @DisplayName("Should delete user successfully")
-    public void shouldDeleteUser() {
-        UserModel savedUser = repository.save(user);
+    void shouldDeleteUser() {
+        UserModel savedUser = repository.save(testUser);
         long userId = savedUser.getId();
 
         repository.deleteById(userId);
