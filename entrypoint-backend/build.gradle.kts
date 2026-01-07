@@ -61,7 +61,11 @@ dependencies {
     // SpringDoc dependencies for OpenAI, Swagger, and Scalar
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-scalar:$springDocVersion")
-    
+
+    // AWS S3 SDK
+    implementation(platform("software.amazon.awssdk:bom:2.27.21"))
+    implementation("software.amazon.awssdk:s3")
+
     compileOnly("org.projectlombok:lombok")
 
     annotationProcessor("org.projectlombok:lombok")
