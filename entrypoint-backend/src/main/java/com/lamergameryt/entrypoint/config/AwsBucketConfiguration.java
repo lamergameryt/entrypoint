@@ -30,6 +30,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
+@ConditionalOnBooleanProperty(name = "aws.s3.enabled")
 public class AwsBucketConfiguration {
     @Value("${aws.key.access}")
     private String accessKey;
@@ -44,7 +45,6 @@ public class AwsBucketConfiguration {
     }
 
     @Bean
-    @ConditionalOnBooleanProperty(name = "aws.s3.enabled")
     public S3Client createS3Client() {
         return S3Client.builder()
                 .endpointOverride(URI.create(properties.getEndpoint()))
@@ -55,7 +55,6 @@ public class AwsBucketConfiguration {
     }
 
     @Bean
-    @ConditionalOnBooleanProperty(name = "aws.s3.enabled")
     public S3Presigner createS3Presigner() {
         return S3Presigner.builder()
                 .endpointOverride(URI.create(properties.getEndpoint()))
