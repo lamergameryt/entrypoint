@@ -1,0 +1,51 @@
+<svg
+  width="256"
+  height="256"
+  viewBox="0 0 256 256"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- Background -->
+  <rect width="256" height="256" rx="40" fill="#F4F4F4"/>
+
+  <!-- Ticket body -->
+  <rect
+    x="48"
+    y="40"
+    width="160"
+    height="176"
+    rx="24"
+    fill="#005461"
+  />
+
+  <!-- Ticket side notches -->
+  <circle cx="48" cy="128" r="14" fill="#F4F4F4"/>
+  <circle cx="208" cy="128" r="14" fill="#F4F4F4"/>
+
+  <!-- Door frame -->
+  <rect
+    x="88"
+    y="64"
+    width="80"
+    height="128"
+    rx="10"
+    fill="#018790"
+  />
+
+  <!-- Door panel -->
+  <rect
+    x="100"
+    y="76"
+    width="56"
+    height="104"
+    rx="8"
+    fill="#F4F4F4"
+  />
+
+  <!-- Door handle -->
+  <circle
+    cx="146"
+    cy="128"
+    r="5"
+    fill="#00B7B5"
+  />
+</svg>
