@@ -48,9 +48,17 @@ repositories {
     mavenCentral()
 }
 
+dependencyManagement {
+    imports {
+        mavenBom("software.amazon.awssdk:bom:2.27.21")
+    }
+}
+
 dependencies {
     val springDocVersion = "3.0.0"
     val therApiVersion = "0.15.0"
+    val testContainersJunitVersion = "1.21.4"
+    val testContainersLocalstackVersion = "1.21.4"
 
     // Spring Boot Dependencies
     implementation("org.springframework.boot:spring-boot-starter")
@@ -63,7 +71,6 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-scalar:$springDocVersion")
 
     // AWS S3 SDK
-    implementation(platform("software.amazon.awssdk:bom:2.27.21"))
     implementation("software.amazon.awssdk:s3")
 
     compileOnly("org.projectlombok:lombok")
@@ -76,6 +83,9 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter:$testContainersJunitVersion")
+    testImplementation("org.testcontainers:localstack:$testContainersLocalstackVersion")
     testImplementation("com.h2database:h2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
