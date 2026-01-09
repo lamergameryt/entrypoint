@@ -53,11 +53,8 @@ public class AwsBucketService {
             this.s3Client.putObject(
                     builder -> builder.bucket(bucketName).key(imageKey).build(), RequestBody.fromBytes(imageData));
             return true;
-        } catch (S3Exception e) {
-            log.error(
-                    "Could not upload image to bucket: {}", e.awsErrorDetails().errorMessage());
         } catch (Exception e) {
-            log.error("Unexpected error occurred while uploading image to bucket: {}", e.getMessage());
+            logS3Exception(e);
         }
 
         return false;
@@ -107,6 +104,6 @@ public class AwsBucketService {
                     "AWS S3 Error - Code: {}, Message: {}",
                     e.awsErrorDetails().errorCode(),
                     e.awsErrorDetails().errorMessage());
-        else if (throwable instanceof Exception) log.error("Unexpected error: {}", throwable.getMessage());
+        else log.error("Unexpected error: {}", throwable.getMessage());
     }
 }

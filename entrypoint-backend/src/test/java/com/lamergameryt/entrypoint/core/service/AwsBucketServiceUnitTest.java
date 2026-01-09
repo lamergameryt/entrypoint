@@ -46,48 +46,45 @@ class AwsBucketServiceUnitTest {
     private S3Presigner presigner;
 
     private AwsBucketService service;
+    private S3Exception s3Exception;
+    private RuntimeException unknownException;
 
     @BeforeEach
     void setup() {
         service = new AwsBucketService(client, presigner);
+        s3Exception = (S3Exception) S3Exception.builder()
+                .awsErrorDetails(
+                        AwsErrorDetails.builder().errorMessage("Access denied").build())
+                .build();
+        unknownException = new RuntimeException("Unknown error");
     }
 
     @Test
     @DisplayName("During file upload, if S3Exception occurs, should return false")
     void testFileUpload() {
-        S3Exception exception = (S3Exception) S3Exception.builder()
-                .awsErrorDetails(
-                        AwsErrorDetails.builder().errorMessage("Access denied").build())
-                .build();
-
-        Mockito.doThrow(exception)
+        Mockito.doThrow(s3Exception)
                 .when(client)
                 .putObject(Mockito.<Consumer<PutObjectRequest.Builder>>any(), Mockito.any(RequestBody.class));
 
-        boolean result = service.addImageToBucket("test-bucket", "image-key", new byte[] {1, 2, 3});
+        var result = service.addImageToBucket("test-bucket", "image-key", new byte[] {1, 2, 3});
         Assertions.assertThat(result).isFalse();
     }
 
     @Test
     @DisplayName("During file upload, if unknown exception occurs, should return false")
     void testFileUploadUnknownException() {
-        Mockito.doThrow(new RuntimeException("Unknown error"))
+        Mockito.doThrow(unknownException)
                 .when(client)
                 .putObject(Mockito.<Consumer<PutObjectRequest.Builder>>any(), Mockito.any(RequestBody.class));
 
-        boolean result = service.addImageToBucket("test-bucket", "image-key", new byte[] {1, 2, 3});
+        var result = service.addImageToBucket("test-bucket", "image-key", new byte[] {1, 2, 3});
         Assertions.assertThat(result).isFalse();
     }
 
     @Test
     @DisplayName("During presigned download url generation, if S3Exception occurs, should get empty optional")
     void testPresignedDownloadUrlGeneration() {
-        S3Exception exception = (S3Exception) S3Exception.builder()
-                .awsErrorDetails(
-                        AwsErrorDetails.builder().errorMessage("Access denied").build())
-                .build();
-
-        Mockito.doThrow(exception)
+        Mockito.doThrow(s3Exception)
                 .when(presigner)
                 .presignGetObject(Mockito.<Consumer<GetObjectPresignRequest.Builder>>any());
 
@@ -98,7 +95,7 @@ class AwsBucketServiceUnitTest {
     @Test
     @DisplayName("During presigned download url generation, if unknown exception occurs, should get empty optional")
     void testPresignedDownloadUrlGenerationUnknownException() {
-        Mockito.doThrow(new RuntimeException("Unknown error"))
+        Mockito.doThrow(unknownException)
                 .when(presigner)
                 .presignGetObject(Mockito.<Consumer<GetObjectPresignRequest.Builder>>any());
 
@@ -109,14 +106,10 @@ class AwsBucketServiceUnitTest {
     @Test
     @DisplayName("During presigned upload url generation, if S3Exception occurs, should get empty optional")
     void testPresignedUploadUrlGeneration() {
-        S3Exception exception = (S3Exception) S3Exception.builder()
-                .awsErrorDetails(
-                        AwsErrorDetails.builder().errorMessage("Access denied").build())
-                .build();
-
-        Mockito.doThrow(exception)
+        Mockito.doThrow(s3Exception)
                 .when(presigner)
                 .presignPutObject(Mockito.<Consumer<PutObjectPresignRequest.Builder>>any());
+
         var result = service.getUploadPresignedUrl("test-bucket", "image-key");
         Assertions.assertThat(result).isEmpty();
     }
@@ -124,7 +117,7 @@ class AwsBucketServiceUnitTest {
     @Test
     @DisplayName("During presigned upload url generation, if unknown exception occurs, should get empty optional")
     void testPresignedUploadUrlGenerationUnknownException() {
-        Mockito.doThrow(new RuntimeException("Unknown error"))
+        Mockito.doThrow(unknownException)
                 .when(presigner)
                 .presignPutObject(Mockito.<Consumer<PutObjectPresignRequest.Builder>>any());
 
