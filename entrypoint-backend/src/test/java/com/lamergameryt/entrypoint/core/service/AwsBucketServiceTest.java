@@ -21,7 +21,11 @@ package com.lamergameryt.entrypoint.core.service;
 import com.lamergameryt.entrypoint.config.AwsBucketProperties;
 import com.lamergameryt.entrypoint.service.AwsBucketService;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,6 +52,8 @@ class AwsBucketServiceTest {
 
     @Autowired
     private AwsBucketProperties properties;
+
+    private final HttpClient client = HttpClient.newHttpClient();
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -77,29 +83,58 @@ class AwsBucketServiceTest {
 
     @Test
     @DisplayName("Should upload file successfully and retrieve presigned URL")
-    void testAddImageToBucket() {
-        String imageName = "test-image.jpg";
+    void testAddImageToBucket() throws IOException, InterruptedException {
+        var imageName = "test-image.jpg";
+        var imageData = this.readResource(imageName);
 
-        byte[] imageData = null;
-        try (var inputStream = getClass().getClassLoader().getResourceAsStream(imageName)) {
-            assert inputStream != null;
-            imageData = inputStream.readAllBytes();
-        } catch (IOException e) {
-            Assertions.fail("Failed to read test image", e);
-        }
+        var uploadResult = awsBucketService.addImageToBucket(properties.getBucket(), imageName, imageData);
+        Assertions.assertThat(uploadResult).isTrue();
 
-        Assertions.assertThat(awsBucketService.addImageToBucket(properties.getBucket(), imageName, imageData))
-                .isTrue();
-
-        var presignedUrlOpt = awsBucketService.getImagePresignedUrl(properties.getBucket(), imageName);
+        var presignedUrlOpt = awsBucketService.getDownloadPresignedUrl(properties.getBucket(), imageName);
         Assertions.assertThat(presignedUrlOpt).isPresent();
 
         var presignedUrl = presignedUrlOpt.get();
-        try (var inputStream = new URL(presignedUrl).openStream()) {
-            byte[] downloadedData = inputStream.readAllBytes();
-            Assertions.assertThat(downloadedData).isEqualTo(imageData);
+        var downloadedData = client.send(HttpRequest.newBuilder(URI.create(presignedUrl)).build(), HttpResponse.BodyHandlers.ofByteArray()).body();
+
+        Assertions.assertThat(downloadedData).isEqualTo(imageData);
+    }
+
+    @Test
+    @DisplayName("Should generate upload presigned URL successfully")
+    void testGetUploadPresignedUrl() throws IOException, InterruptedException {
+        var imageName = "test-image.jpg";
+        var presignedUrlOpt = awsBucketService.getUploadPresignedUrl(properties.getBucket(), imageName);
+
+        Assertions.assertThat(presignedUrlOpt).isPresent();
+
+        var presignedUrl = presignedUrlOpt.get();
+        var imageData = this.readResource(imageName);
+
+        var request = HttpRequest.newBuilder(URI.create(presignedUrl))
+                .timeout(Duration.ofSeconds(10))
+                .PUT(HttpRequest.BodyPublishers.ofByteArray(imageData))
+                .build();
+
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        var downloadUrlOpt = awsBucketService.getDownloadPresignedUrl(properties.getBucket(), imageName);
+        Assertions.assertThat(downloadUrlOpt).isPresent();
+
+        var downloadUrl = downloadUrlOpt.get();
+        var downloadedData = client.send(
+                        HttpRequest.newBuilder(URI.create(downloadUrl)).GET().build(),
+                        HttpResponse.BodyHandlers.ofByteArray())
+                .body();
+        Assertions.assertThat(downloadedData).isEqualTo(imageData);
+    }
+
+    private byte[] readResource(String resourceName) {
+        try (var inputStream = getClass().getClassLoader().getResourceAsStream(resourceName)) {
+            Assertions.assertThat(inputStream).isNotNull();
+            return inputStream.readAllBytes();
         } catch (IOException e) {
-            Assertions.fail("Failed to download image from presigned URL", e);
+            Assertions.fail("Failed to read resource: " + resourceName, e);
+            return new byte[0];
         }
     }
 }

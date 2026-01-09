@@ -21,46 +21,92 @@ package com.lamergameryt.entrypoint.service;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.Bucket;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 
 @Service
+@ConditionalOnBooleanProperty(name = "aws.s3.enabled")
+@Slf4j
 public class AwsBucketService {
-    private final Optional<S3Client> s3Client;
-    private final Optional<S3Presigner> s3Presigner;
+    private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
 
-    public AwsBucketService(Optional<S3Client> s3Client, Optional<S3Presigner> s3Presigner) {
+    public AwsBucketService(S3Client s3Client, S3Presigner s3Presigner) {
         this.s3Client = s3Client;
         this.s3Presigner = s3Presigner;
     }
 
     public List<Bucket> getAllBuckets() {
-        if (s3Client.isEmpty()) return List.of();
-
-        return this.s3Client.get().listBuckets().buckets();
+        return this.s3Client.listBuckets().buckets();
     }
 
     public boolean addImageToBucket(String bucketName, String imageKey, byte[] imageData) {
-        if (s3Client.isEmpty()) return false;
-        this.s3Client
-                .get()
-                .putObject(
-                        builder -> builder.bucket(bucketName).key(imageKey).build(), RequestBody.fromBytes(imageData));
-        return true;
+        try {
+            this.s3Client.putObject(
+                    builder -> builder.bucket(bucketName).key(imageKey).build(), RequestBody.fromBytes(imageData));
+            return true;
+        } catch (S3Exception e) {
+            log.error(
+                    "Could not upload image to bucket: {}", e.awsErrorDetails().errorMessage());
+        } catch (Exception e) {
+            log.error("Unexpected error occurred while uploading image to bucket: {}", e.getMessage());
+        }
+
+        return false;
     }
 
-    public Optional<String> getImagePresignedUrl(String bucketName, String imageKey) {
-        if (s3Presigner.isEmpty()) return Optional.empty();
+    public Optional<String> getUploadPresignedUrl(String bucketName, String imageKey) {
+        return this.getUploadPresignedUrl(bucketName, imageKey, Duration.ofHours(1));
+    }
 
-        PresignedGetObjectRequest response = s3Presigner.get().presignGetObject(builder -> builder.signatureDuration(
-                        Duration.ofHours(1))
-                .getObjectRequest(req -> req.bucket(bucketName).key(imageKey).build())
-                .build());
+    public Optional<String> getDownloadPresignedUrl(String bucketName, String imageKey) {
+        return this.getDownloadPresignedUrl(bucketName, imageKey, Duration.ofHours(1));
+    }
 
-        return response.url().toExternalForm().describeConstable();
+    public Optional<String> getUploadPresignedUrl(String bucketName, String imageKey, Duration duration) {
+        try {
+            PresignedPutObjectRequest response =
+                    s3Presigner.presignPutObject(builder -> builder.signatureDuration(duration)
+                            .putObjectRequest(req -> req.bucket(bucketName).key(imageKey))
+                            .build());
+
+            return Optional.of(response.url().toExternalForm());
+        } catch (Exception e) {
+            logS3Exception(e);
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<String> getDownloadPresignedUrl(String bucketName, String imageKey, Duration duration) {
+        try {
+            PresignedGetObjectRequest response =
+                    s3Presigner.presignGetObject(builder -> builder.signatureDuration(duration)
+                            .getObjectRequest(req -> req.bucket(bucketName).key(imageKey))
+                            .build());
+
+            return Optional.of(response.url().toExternalForm());
+        } catch (Exception e) {
+            logS3Exception(e);
+        }
+
+        return Optional.empty();
+    }
+
+    private void logS3Exception(Throwable throwable) {
+        if (throwable instanceof S3Exception e)
+            log.error(
+                    "AWS S3 Error - Code: {}, Message: {}",
+                    e.awsErrorDetails().errorCode(),
+                    e.awsErrorDetails().errorMessage());
+        else if (throwable instanceof Exception) log.error("Unexpected error: {}", throwable.getMessage());
     }
 }
