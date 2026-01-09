@@ -94,7 +94,10 @@ class AwsBucketServiceTest {
         Assertions.assertThat(presignedUrlOpt).isPresent();
 
         var presignedUrl = presignedUrlOpt.get();
-        var downloadedData = client.send(HttpRequest.newBuilder(URI.create(presignedUrl)).build(), HttpResponse.BodyHandlers.ofByteArray()).body();
+        var downloadedData = client.send(
+                        HttpRequest.newBuilder(URI.create(presignedUrl)).build(),
+                        HttpResponse.BodyHandlers.ofByteArray())
+                .body();
 
         Assertions.assertThat(downloadedData).isEqualTo(imageData);
     }
