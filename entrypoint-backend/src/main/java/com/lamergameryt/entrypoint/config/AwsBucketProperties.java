@@ -16,9 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.lamergameryt.entrypoint.db;
+package com.lamergameryt.entrypoint.config;
 
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-@DataJpaTest
-public class DbTestBase {}
+@Component
+@ConfigurationProperties(prefix = "aws.s3")
+@Data
+public class AwsBucketProperties {
+    private String region;
+    private String endpoint;
+    private String bucket;
+}

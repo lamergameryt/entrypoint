@@ -16,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.lamergameryt.entrypoint.db.user;
+package com.lamergameryt.entrypoint.core.db.repository;
 
-import com.lamergameryt.entrypoint.db.DbTestBase;
+import com.lamergameryt.entrypoint.core.db.DbTestBase;
 import com.lamergameryt.entrypoint.model.UserModel;
 import com.lamergameryt.entrypoint.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
