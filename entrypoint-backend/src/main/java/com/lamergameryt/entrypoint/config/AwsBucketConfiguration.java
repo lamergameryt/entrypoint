@@ -32,16 +32,19 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 @Configuration
 @ConditionalOnBooleanProperty(name = "aws.s3.enabled")
 public class AwsBucketConfiguration {
-    @Value("${aws.key.access}")
-    private String accessKey;
+    private final String accessKey;
 
-    @Value("${aws.key.secret}")
-    private String secretKey;
+    private final String secretKey;
 
     private final AwsBucketProperties properties;
 
-    public AwsBucketConfiguration(AwsBucketProperties properties) {
+    public AwsBucketConfiguration(
+            AwsBucketProperties properties,
+            @Value("${aws.key.access}") String accessKey,
+            @Value("${aws.key.secret}") String secretKey) {
         this.properties = properties;
+        this.accessKey = accessKey;
+        this.secretKey = secretKey;
     }
 
     @Bean
