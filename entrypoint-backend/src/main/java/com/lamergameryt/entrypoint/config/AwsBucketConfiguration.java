@@ -33,9 +33,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 @ConditionalOnBooleanProperty(name = "aws.s3.enabled")
 public class AwsBucketConfiguration {
     private final String accessKey;
-
     private final String secretKey;
-
     private final AwsBucketProperties properties;
 
     public AwsBucketConfiguration(
