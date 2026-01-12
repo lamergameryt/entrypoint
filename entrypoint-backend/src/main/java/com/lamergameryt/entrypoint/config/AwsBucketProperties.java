@@ -32,12 +32,11 @@ public class AwsBucketProperties {
      * <p>For AWS, this is the standard region identifier, for example:
      *
      * <ul>
-     *   <li>{@code us-east-1}</li>
-     *   <li>{@code eu-central-1}</li>
+     *   <li>{@code us-east-1}
+     *   <li>{@code eu-central-1}
      * </ul>
      *
-     * <p>For S3-compatible providers (such as Backblaze B2), use the region name defined
-     * by that provider.
+     * <p>For S3-compatible providers (such as Backblaze B2), use the region name defined by that provider.
      *
      * <p>Configured via {@code aws.s3.region}.
      */
@@ -46,19 +45,19 @@ public class AwsBucketProperties {
     /**
      * HTTP endpoint for the S3 or S3-compatible object storage service.
      *
-     * <p>This can point to the default AWS S3 endpoint or to an alternative S3-compatible
-     * provider such as Backblaze B2.
+     * <p>This can point to the default AWS S3 endpoint or to an alternative S3-compatible provider such as Backblaze
+     * B2.
      *
      * <p>Example values:
      *
      * <ul>
-     *   <li>AWS global endpoint: {@code https://s3.amazonaws.com}</li>
-     *   <li>AWS regional endpoint: {@code https://s3.us-east-1.amazonaws.com}</li>
-     *   <li>Backblaze B2 endpoint: {@code https://s3.us-west-004.backblazeb2.com}</li>
+     *   <li>AWS global endpoint: {@code https://s3.amazonaws.com}
+     *   <li>AWS regional endpoint: {@code https://s3.us-east-1.amazonaws.com}
+     *   <li>Backblaze B2 endpoint: {@code https://s3.us-west-004.backblazeb2.com}
      * </ul>
      *
-     * <p>Configured via {@code aws.s3.endpoint}. Depending on your S3 client configuration,
-     * this may be optional when using the default AWS endpoints.
+     * <p>Configured via {@code aws.s3.endpoint}. Depending on your S3 client configuration, this may be optional when
+     * using the default AWS endpoints.
      */
     private String endpoint;
 
@@ -68,8 +67,8 @@ public class AwsBucketProperties {
      * <p>Example values:
      *
      * <ul>
-     *   <li>{@code entrypoint-uploads}</li>
-     *   <li>{@code entrypoint-assets-prod}</li>
+     *   <li>{@code entrypoint-uploads}
+     *   <li>{@code entrypoint-assets-prod}
      * </ul>
      *
      * <p>Configured via {@code aws.s3.bucket}.
