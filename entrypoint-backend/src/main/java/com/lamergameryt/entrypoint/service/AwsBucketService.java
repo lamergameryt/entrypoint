@@ -99,11 +99,13 @@ public class AwsBucketService {
     }
 
     private void logS3Exception(Throwable throwable) {
-        if (throwable instanceof S3Exception e)
+        if (throwable instanceof S3Exception e) {
             log.error(
                     "AWS S3 Error - Code: {}, Message: {}",
                     e.awsErrorDetails().errorCode(),
                     e.awsErrorDetails().errorMessage());
-        else log.error("Unexpected error: {}", throwable.getMessage());
+        } else {
+            log.error("Unexpected error: {}", throwable.getMessage());
+        }
     }
 }
