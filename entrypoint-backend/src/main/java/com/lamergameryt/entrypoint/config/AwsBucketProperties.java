@@ -26,7 +26,53 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "aws.s3")
 @Data
 public class AwsBucketProperties {
+    /**
+     * AWS or S3-compatible region where the bucket is hosted.
+     *
+     * <p>For AWS, this is the standard region identifier, for example:
+     *
+     * <ul>
+     *   <li>{@code us-east-1}</li>
+     *   <li>{@code eu-central-1}</li>
+     * </ul>
+     *
+     * <p>For S3-compatible providers (such as Backblaze B2), use the region name defined
+     * by that provider.
+     *
+     * <p>Configured via {@code aws.s3.region}.
+     */
     private String region;
+
+    /**
+     * HTTP endpoint for the S3 or S3-compatible object storage service.
+     *
+     * <p>This can point to the default AWS S3 endpoint or to an alternative S3-compatible
+     * provider such as Backblaze B2.
+     *
+     * <p>Example values:
+     *
+     * <ul>
+     *   <li>AWS global endpoint: {@code https://s3.amazonaws.com}</li>
+     *   <li>AWS regional endpoint: {@code https://s3.us-east-1.amazonaws.com}</li>
+     *   <li>Backblaze B2 endpoint: {@code https://s3.us-west-004.backblazeb2.com}</li>
+     * </ul>
+     *
+     * <p>Configured via {@code aws.s3.endpoint}. Depending on your S3 client configuration,
+     * this may be optional when using the default AWS endpoints.
+     */
     private String endpoint;
+
+    /**
+     * Name of the S3 bucket used by the application to store objects such as uploaded files.
+     *
+     * <p>Example values:
+     *
+     * <ul>
+     *   <li>{@code entrypoint-uploads}</li>
+     *   <li>{@code entrypoint-assets-prod}</li>
+     * </ul>
+     *
+     * <p>Configured via {@code aws.s3.bucket}.
+     */
     private String bucket;
 }
