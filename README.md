@@ -29,10 +29,10 @@ cd entrypoint/entrypoint-backend
 ./gradlew bootRun
 ```
 
-## ▶️ Running the Prontend
+## ▶️ Running the Frontend
 
 ```bash
-cd entrypoint/entrypoint-fronten
+cd entrypoint/entrypoint-frontend
 npm run dev
 ```
 
