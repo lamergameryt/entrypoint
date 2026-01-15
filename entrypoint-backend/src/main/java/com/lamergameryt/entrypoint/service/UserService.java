@@ -18,6 +18,7 @@
 
 package com.lamergameryt.entrypoint.service;
 
+import com.lamergameryt.entrypoint.model.Group;
 import com.lamergameryt.entrypoint.model.UserModel;
 import com.lamergameryt.entrypoint.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -37,12 +38,13 @@ public class UserService {
     }
 
     @Transactional
-    public UserModel createUser(String name, String email, String password) {
+    public UserModel createUser(String name, String email, String password,Group group) {
         UserModel userModel = new UserModel();
 
         userModel.setName(name);
         userModel.setEmail(email);
         userModel.setPassword(password);
+        userModel.setGroup(group);
 
         return userRepository.save(userModel);
     }

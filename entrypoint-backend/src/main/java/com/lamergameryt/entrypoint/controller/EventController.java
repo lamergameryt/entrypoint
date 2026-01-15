@@ -36,6 +36,7 @@ import java.util.List;
 import lombok.val;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -58,6 +59,8 @@ public class EventController {
      *
      * @return A list of available events
      */
+
+    @PreAuthorize("hasAuthority('VIEW_EVENT')")
     @GetMapping()
     public ResponseEntity<List<EventDto>> getAllEvents() {
         val events =
@@ -74,6 +77,7 @@ public class EventController {
      * @param eventData The event creation data
      * @return The created event data
      */
+    @PreAuthorize("hasAuthority('CREATE_EVENT')")
     @PostMapping()
     public ResponseEntity<EventDto> createEvent(@Valid @RequestBody EventCreateRequestDto eventData) {
         val event = eventService.createEvent(eventData.name(), eventData.description(), eventData.startDate());
@@ -89,7 +93,8 @@ public class EventController {
      * @param name Name of the event to fuzzy find.
      * @param startsAfter The date after which the event starts.
      * @return The list of events matching the search
-     */
+     */    
+    @PreAuthorize("hasAuthority('VIEW_EVENT')")
     @GetMapping("/search")
     public ResponseEntity<List<EventDto>> getEvents(
             @RequestParam @NotNull String name,
@@ -114,6 +119,7 @@ public class EventController {
      * @param eventId The id of the event
      * @return The list of available tickets
      */
+    @PreAuthorize("hasAuthority('VIEW_EVENT')")
     @GetMapping("/{eventId}/tickets")
     public ResponseEntity<List<TicketDto>> getTicketsForEvent(@PathVariable @Positive long eventId) {
         val tickets = ticketService.getAvailableForEvent(eventId).stream()
@@ -131,6 +137,8 @@ public class EventController {
      * @param ticketRequest The ticket creation data
      * @return The created ticket data
      */
+    
+    @PreAuthorize("hasAuthority('VIEW_EVENT')")
     @PostMapping("/{eventId}/tickets")
     public ResponseEntity<TicketDto> createTicketForEvent(
             @PathVariable @Positive long eventId, @Valid @RequestBody TicketCreateRequestDto ticketRequest) {
@@ -147,6 +155,7 @@ public class EventController {
      * @param ticketId The id of the ticket to delete
      * @return A response indicating the deletion status
      */
+    @PreAuthorize("hasAuthority('EDIT_EVENT')")
     @DeleteMapping("/{eventId}/tickets/{ticketId}")
     public ResponseEntity<Void> deleteTicketForEvent(
             @PathVariable @Positive long eventId, @PathVariable @Positive long ticketId) {

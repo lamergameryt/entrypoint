@@ -61,14 +61,20 @@ dependencies {
     // SpringDoc dependencies for OpenAI, Swagger, and Scalar
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-scalar:$springDocVersion")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     
     compileOnly("org.projectlombok:lombok")
+    compileOnly("jakarta.servlet:jakarta.servlet-api:6.0.0")
+    
 
     annotationProcessor("org.projectlombok:lombok")
     annotationProcessor("com.github.therapi:therapi-runtime-javadoc-scribe:$therApiVersion")
 
     runtimeOnly("com.github.therapi:therapi-runtime-javadoc:$therApiVersion")
     runtimeOnly("com.mysql:mysql-connector-j")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")

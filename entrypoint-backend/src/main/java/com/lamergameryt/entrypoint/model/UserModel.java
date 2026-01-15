@@ -44,4 +44,9 @@ public class UserModel {
     @NotNull @Email private String email;
 
     @NotNull private String password;
+    // Many users belong to one group
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "group_id")
+    private Group group;
+
 }

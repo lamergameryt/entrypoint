@@ -18,9 +18,12 @@
 
 package com.lamergameryt.entrypoint.controller;
 
+import com.lamergameryt.entrypoint.config.JwtUtil;
 import com.lamergameryt.entrypoint.dto.UserDto;
 import com.lamergameryt.entrypoint.dto.request.UserLoginRequestDto;
+import com.lamergameryt.entrypoint.dto.request.UserLoginResponseDto;
 import com.lamergameryt.entrypoint.dto.request.UserRegisterRequestDto;
+import com.lamergameryt.entrypoint.service.GroupService;
 import com.lamergameryt.entrypoint.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -29,6 +32,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.val;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,53 +46,62 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/user")
 @Tag(name = "user", description = "API routes to manage user authentication")
 public class UserController {
-    private final UserService userService;
+	private final UserService userService;
+	private final GroupService groupService;
+	@Autowired
+	private JwtUtil jwtUtil;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+	public UserController(UserService userService, GroupService groupService) {
+		this.userService = userService;
+		this.groupService = groupService;
+	}
 
-    /**
-     * Login a user
-     *
-     * <p>Performs credentials checks against the entered details.<br>
-     * Invalid credentials throw a 403 exception.
-     *
-     * @param login The login credentials to validate
-     * @return The details of the logged-in user
-     */
-    @PostMapping("/login")
-    @Operation(
-            responses = {
-                @ApiResponse(
-                        description = "User credentials validated successfully",
-                        responseCode = "200",
-                        content = @Content(schema = @Schema(implementation = UserDto.class))),
-                @ApiResponse(
-                        description = "Invalid user credentials entered",
-                        responseCode = "403",
-                        content = @Content(schema = @Schema(implementation = String.class)))
-            })
-    public ResponseEntity<UserDto> loginUser(@Valid @RequestBody UserLoginRequestDto login) {
-        val user = userService.findByCredentials(login.email(), login.password());
-        if (user.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials entered.");
-        }
+	/**
+	 * Login a user
+	 *
+	 * <p>
+	 * Performs credentials checks against the entered details.<br>
+	 * Invalid credentials throw a 403 exception.
+	 *
+	 * @param login The login credentials to validate
+	 * @return The details of the logged-in user
+	 */
+	@PostMapping("/login")
+	@Operation(responses = {
+			@ApiResponse(description = "User credentials validated successfully", responseCode = "200", content = @Content(schema = @Schema(implementation = UserDto.class))),
+			@ApiResponse(description = "Invalid user credentials entered", responseCode = "403", content = @Content(schema = @Schema(implementation = String.class))) })
+	public ResponseEntity<UserLoginResponseDto> loginUser(@Valid @RequestBody UserLoginRequestDto login) {
+		System.out.println("inside controller");
 
-        return ResponseEntity.ok(UserDto.from(user.get()));
-    }
+		val user = userService.findByCredentials(login.email(), login.password());
+		if (user.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials entered.");
+		}
+		val roles = user.get().getGroup().getRoles(); // get roles from group
+		String token = jwtUtil.generateToken(user.get().getEmail(), roles);
 
-    /**
-     * Register a user
-     *
-     * <p>Create a new user account using the provided credentials.
-     *
-     * @param register The data to registration a new account
-     * @return The details of the registered user
-     */
-    @PostMapping("/register")
-    public ResponseEntity<UserDto> registerUser(@Valid @RequestBody UserRegisterRequestDto register) {
-        val user = userService.createUser(register.name(), register.email(), register.password());
-        return ResponseEntity.ok(UserDto.from(user));
-    }
+		val response = UserLoginResponseDto.builder().token(token).name(user.get().getName())
+				.email(user.get().getEmail()).build();
+
+		return ResponseEntity.ok(response);
+		// return ResponseEntity.ok(UserDto.from(user.get()));
+	}
+
+	/**
+	 * Register a user
+	 *
+	 * <p>
+	 * Create a new user account using the provided credentials.
+	 *
+	 * @param register The data to registration a new account
+	 * @return The details of the registered user
+	 */
+	@PostMapping("/register")
+	public ResponseEntity<UserDto> registerUser(@Valid @RequestBody UserRegisterRequestDto register) {
+
+		val user = userService.createUser(register.name(), register.email(), register.password(),
+				groupService.getById(register.groupId()));
+
+		return ResponseEntity.ok(UserDto.from(user));
+	}
 }
