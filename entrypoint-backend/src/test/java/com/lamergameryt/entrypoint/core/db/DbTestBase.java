@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.lamergameryt.entrypoint.db;
+package com.lamergameryt.entrypoint.core.db;
 
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
