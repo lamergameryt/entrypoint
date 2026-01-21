@@ -1,12 +1,9 @@
 package com.lamergameryt.entrypoint.dto.request;
 
-import lombok.Builder;
-import lombok.Getter;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
-@Getter
-@Builder
-public class UserLoginResponseDto {
-    private String token;
-    private String name;
-    private String email;
-}
+public record UserLoginResponseDto(@NotBlank String token,
+		@NotBlank String name,
+		@Email @NotBlank String email) {
+    }

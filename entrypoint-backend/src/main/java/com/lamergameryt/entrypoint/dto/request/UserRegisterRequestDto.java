@@ -23,6 +23,7 @@ import jakarta.validation.constraints.*;
 public record UserRegisterRequestDto(
         @Size(max = 255) @NotBlank String name,
         @Email @Size(max = 255) @NotBlank String email,
-        @Size(min = 8, max = 255) @NotBlank String password,
-        long groupId
+        @Size(min = 8, max = 255) @NotBlank String password
         ) {}
+    
+

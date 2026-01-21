@@ -6,6 +6,7 @@
 .idea/**/dictionaries
 .idea/**/shelf
 
+
 # AWS User-specific
 .idea/**/aws.xml
 
@@ -109,6 +110,9 @@ gradle-app.setting
 # Eclipse Gradle plugin generated files
 # Eclipse Core
 .project
+
+# Eclipse / Buildship
+.settings/
 
 # JDT-specific (Eclipse Java Development Tools)
 .classpath

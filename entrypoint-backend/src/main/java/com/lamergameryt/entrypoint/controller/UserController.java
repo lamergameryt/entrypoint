@@ -34,6 +34,7 @@ import jakarta.validation.Valid;
 import lombok.val;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,6 +51,9 @@ public class UserController {
 	private final GroupService groupService;
 	@Autowired
 	private JwtUtil jwtUtil;
+	@Value("${app.default-user-group-id}")
+	private long defaultUserGroupId;
+
 
 	public UserController(UserService userService, GroupService groupService) {
 		this.userService = userService;
@@ -80,8 +84,13 @@ public class UserController {
 		val roles = user.get().getGroup().getRoles(); // get roles from group
 		String token = jwtUtil.generateToken(user.get().getEmail(), roles);
 
-		val response = UserLoginResponseDto.builder().token(token).name(user.get().getName())
-				.email(user.get().getEmail()).build();
+		
+		UserLoginResponseDto response =
+		        new UserLoginResponseDto(
+		        		token,
+		        		user.get().getName(),
+		        		user.get().getEmail()
+		                  );
 
 		return ResponseEntity.ok(response);
 		// return ResponseEntity.ok(UserDto.from(user.get()));
@@ -100,7 +109,7 @@ public class UserController {
 	public ResponseEntity<UserDto> registerUser(@Valid @RequestBody UserRegisterRequestDto register) {
 
 		val user = userService.createUser(register.name(), register.email(), register.password(),
-				groupService.getById(register.groupId()));
+				groupService.getById(defaultUserGroupId));
 
 		return ResponseEntity.ok(UserDto.from(user));
 	}
